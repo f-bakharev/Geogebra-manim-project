@@ -1,10 +1,4 @@
-# GeoGebra-Manim Project
-
-Implementation of the main Geogebra methods in the python manim library with a Streamlit UI for easy interaction.
-
-## Setup & Run Instructions
-
-### Option 1: Command Line Usage
+# GeoGebra-Manim Project Setup & Run Instructions
 
 1. **Clone the repository**  
    ```bash
@@ -24,55 +18,20 @@ Implementation of the main Geogebra methods in the python manim library with a S
      .\venv\Scripts\Activate.ps1
      ```
 
-3. **Install dependencies**  
+4. **Install dependencies**  
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the code generator**  
+5. **Run the code generator**  
    ```bash
-   python manim_code_generator.py path/to/input.ggb -o path/to/output.py
+   python manim_code_generator.py path/to/input.ggb -o path/to/your/generated_code.py
    ```
 
-5. **Render your Manim scene**  
+6. **Render your Manim scene**  
    ```bash
-   manim -pql output.py MyScene
+   manim -pql generated_scene.py MyScene
    ```
-
-### Option 2: Streamlit UI (NEW!)
-
-We now provide a user-friendly web interface to convert GeoGebra files to Manim animations:
-
-1. **Install dependencies**  
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Run the Streamlit app**  
-   ```bash
-   streamlit run app.py
-   ```
-
-3. **Use the web interface**  
-   * Upload your .ggb file
-   * Configure rendering options
-   * Click "Generate Animation"
-   * View and download the resulting video
-
-### Option 3: Docker (NEW!)
-
-For containerized deployment:
-
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# Or build and run with Docker directly
-docker build -t geogebra-manim .
-docker run -p 8501:8501 geogebra-manim
-```
-
-Access the UI at http://localhost:8501
 
 ### How to automatically create animated solutions for problems using this project?
 1. Put file `open_ai_key` with your chatGpt API key in the folder of cloned repository.
