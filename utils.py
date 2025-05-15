@@ -22,7 +22,11 @@ def midPoint(p1: Point, p2: Point, name=None):
 
 
 _scene = None
-_new_position = lambda x, y: (x, y)
+
+
+# function that calculates new position of points with respect to scaling (by default it does not change coordinates)
+def _new_position(x, y):
+    return x, y
 
 
 def init(scene):
@@ -306,17 +310,11 @@ def circle(center: Point | str | tuple[int | float] = None,
 
 
 @on_scene
-def circle(center: Point | str | tuple[int | float] = None,
-           r: float = 1,
-           label: str = None):
-    """
-    Draw a circle
-    :param center - center of the circle
-    :param r - radius of the circle
-    :label - optional label of the circle
-    """
-    return Circle(_scene, center=center, r=r, label=label)
+def circle_from_two_points(center: str | Point | tuple[float, float],
+                             p: str | Point | tuple[float, float],
+                             label: str = None):
 
+    return Circle.from_two_points(_scene, center, p, label)
 
 @on_scene
 def circle_from_three_points(p1: str | Point | tuple[float, float],
@@ -346,11 +344,23 @@ def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None
     :param label_y - (optional) y position of the label of the point
     :param show_label: determines show label of the point on the scene or not
     """
+    # x_new = None if x is None else _new_position(x, y)[0]
+    # print(f'x: {x}, x_new: {x_new}')
+    #
+    # y_new = None if y is None else _new_position(x, y)[1]
+    # print(f'y: {y}, y_new: {y_new}')
+    #
+    # label_x_new = None if label_x is None else _new_position(label_x, label_y)[0]
+    # print(f'label_x: {label_x}, label_x_new: {label_x_new}')
+    #
+    # label_y_new = None if label_y is None else _new_position(label_x, label_y)[1]
+    # print(f'label_y: {label_y}, label_y_new: {label_y_new}')
+
     return Point(_scene, name,
-                 None if x is None else _new_position(x, y)[0],
-                 None if y is None else _new_position(x, y)[1],
-                 label_x=label_x,
-                 label_y=label_y,
+                 x=None if x is None else _new_position(x, y)[0],
+                 y=None if y is None else _new_position(x, y)[1],
+                 label_x=None if label_x is None else _new_position(label_x, label_y)[0],
+                 label_y=None if label_y is None else _new_position(label_x, label_y)[1],
                  show_label=show_label,
                  show_point=show_point)
 
@@ -380,7 +390,7 @@ def move_label(point: str | Point | tuple[float, float],
                label_x: float = None,
                label_y: float = None,
                run_time: float = 0):
-    to_point(_scene, point).move_label_to(label_x=label_x, label_y=label_y, run_time=run_time)
+    to_point(_scene, point).move_label_to(label_dx=label_x, label_dy=label_y, run_time=run_time)
 
 
 @on_scene
@@ -481,7 +491,25 @@ def triangle_center(p1: str | Point | tuple[int | float, int | float],
     p2 = to_point(_scene, p2)
     p3 = to_point(_scene, p3)
 
-    return Point(_scene, name=pointName, get_position=tr.get_circumscribed_pos_r(p1, p2, p3))
+    return Point(_scene, name=pointName, get_position=tr.get_circumscribed_pos_r(p1, p2, p3)[0])
+
+
+@on_scene
+def triangle_orthocenter(triangle: str | Triangle,
+                         label: str = None):
+    triangle = to_figure(triangle)
+
+    return Point(_scene, name=label,
+                 get_position=lambda: get_orthocenter(triangle.p1, triangle.p2, triangle.p3))
+
+
+@on_scene
+def triangle_centroid(triangle: str | Triangle,
+                         label: str = None):
+    triangle = to_figure(triangle)
+
+    return Point(_scene, name=label,
+                 get_position=lambda: get_centroid(triangle.p1, triangle.p2, triangle.p3))
 
 
 @on_scene
@@ -589,17 +617,16 @@ def inscribed_circle(triangle: str | Triangle,
                    get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
 
     return Circle(_scene, center=center,
-                  get_r=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[1], label=circle_label)
+                  get_r=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0], label=circle_label)
+
 
 @on_scene
 def inscribed_circle_center(triangle: str | Triangle,
-                     label: str = None):
-
+                            label: str = None):
     triangle = to_figure(triangle)
 
     return Point(_scene, name=label,
-                   get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
-
+                 get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
 
 
 @on_scene
@@ -702,7 +729,8 @@ def recenter_camera(point_cords=None, run_time=2):
     _new_position = new_position
 
     if points:
-        move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
+        move_points(points, [new_position(point.x, point.y) for point in points],
+                    run_time=run_time)
 
 
 @on_scene
