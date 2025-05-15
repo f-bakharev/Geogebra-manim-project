@@ -99,23 +99,22 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
-        self.label_dx = ValueTracker(default_label_offset_x if label_x is None else label_x)
-        self.label_dy = ValueTracker(default_label_offset_y if label_y is None else label_y)
+        self.label_dx = ValueTracker(0 if label_x is None else label_x)
+        self.label_dy = ValueTracker(0 if label_y is None else label_y)
 
         self.update_label_position()
 
-        if show_label is None:
-            self.show_label = settings.show_point_labels
-        else:
-            self.show_label = show_label
+        self.show_label = settings.show_point_labels if show_label is None else show_label
 
-        self._show_point = show_point
+        self.show_point = show_point
+
+        print(self.name, self.show_label, self.show_point)
 
         self.render()
 
     def update_label_position(self):
-        self.label_position = lambda: (self.x + self.label_dx.get_value() * settings.label_position_scaling_factor,
-                                       self.y + self.label_dy.get_value() * settings.label_position_scaling_factor,
+        self.label_position = lambda: (self.x + (settings.default_label_offset_x + self.label_dx.get_value()) * settings.label_position_scaling_factor,
+                                       self.y + (settings.default_label_offset_y + self.label_dy.get_value()) * settings.label_position_scaling_factor,
                                        0)
 
     def move_label_to(self, label_dx, label_dy, run_time=0):
